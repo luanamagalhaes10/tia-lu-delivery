@@ -24,8 +24,12 @@ while True:
             if opcaoItem == "1":
                 nome = input("\nNome do item: ")
                 descricao = input("Descrição: ")
-                preco = float(input("Preço: "))
-                estoque = int(input("Quantidade em estoque: "))
+                try:
+                    preco = float(input("Preço: "))
+                    estoque = int(input("Quantidade em estoque: "))
+                except ValueError:
+                    print("\nErro: preço ou quantidade inválidos!")
+                    continue
 
                 item = [codigoI, nome, descricao, preco, estoque]
                 itens.append(item)
@@ -45,9 +49,13 @@ while True:
                 if not itens:
                     print("\n Ainda não há itens cadastrados para atualizar.")
                 else: 
-                    codigo_id = int(input("\nDigite o código do item: "))
+                    try:
+                        codigo_id = int(input("\nDigite o código do item: "))
+                    except ValueError:
+                        print("Código inválido!")
+                        continue
+                    
                     encontrado = False
-
                     for item in itens: 
                         if item[0] == codigo_id: 
                             print(f"\nAtualizando o item: {item[1]}")
@@ -62,13 +70,19 @@ while True:
 
                             novoPreco = input("Novo preço: ")
                             if novoPreco != "":
-                                item[3] = float(novoPreco)
+                                try:
+                                    item[3] = float(novoPreco)
+                                except ValueError:
+                                    print("Preço inválido.")
 
                             novoEstoque = input("Novo estoque: ")
                             if novoEstoque != "":
-                                item[4] = int(novoEstoque)
-                                print("\n Item atualizado com sucesso!")
-                                
+                                try:
+                                    item[4] = int(novoEstoque)
+                                except ValueError:
+                                    print("Quantidade inválida.")
+
+                            print("\n Item atualizado com sucesso!")
                             encontrado = True
                             break
                                 
@@ -105,13 +119,22 @@ while True:
                         for item in itens:
                             print(f"Código: {item[0]} \nNome: {item[1]} \nDescrição: {item[2]} \nPreço: R${item[3]:.2f} \nEstoque: {item[4]}\n")
 
-                        codigoEscolhido = int(input("\nDigite o código do item que deseja adicionar: "))
-                        encontrado = False  
+                        try:
+                            codigoEscolhido = int(input("\nDigite o código do item que deseja adicionar: "))
+                        except ValueError:
+                            print("Código inválido.")
+                            continue
 
+                        encontrado = False  
                         for item in itens: 
                             if item[0] == codigoEscolhido: 
                                 encontrado = True
-                                qtt = int(input("Digite a quantidade que deseja: "))
+                                try:
+                                    qtt = int(input("Digite a quantidade que deseja: "))
+                                except ValueError:
+                                    print("Quantidade inválida.")
+                                    continue
+
                                 if qtt <= item[4]:
                                     PedidoItem.append([item[1], qtt, item[3]])
                                     total += item[3] * qtt
@@ -125,7 +148,6 @@ while True:
                             print("Item não encontrado")
 
                         continuar = input("Deseja adicionar outro item? \n [1] Sim \n [2] Não:\n")
-                           
                         if continuar == "1":
                             continue
                         else: 
@@ -163,7 +185,12 @@ while True:
                             print(f"Pedido {pedido[0]} REJEITADO.")
 
             elif opcaoPedido == "3":
-                codigo_id = int(input("Digite o código do pedido: "))
+                try:
+                    codigo_id = int(input("Digite o código do pedido: "))
+                except ValueError:
+                    print("Código inválido!")
+                    continue
+
                 encontrado = False
                 for pedido in pedidos:
                     if pedido[0] == codigo_id:
@@ -188,7 +215,12 @@ while True:
                     print("Pedido não encontrado.")
 
             elif opcaoPedido == "4":
-                codigo_id = int(input("Digite o código do pedido: "))
+                try:
+                    codigo_id = int(input("Digite o código do pedido: "))
+                except ValueError:
+                    print("Código inválido!")
+                    continue
+
                 for pedido in pedidos:
                     if pedido[0] == codigo_id:
                         if pedido[3] in ["AGUARDANDO APROVAÇÃO", "ACEITO", "FAZENDO"]:
@@ -204,16 +236,77 @@ while True:
                 if not pedidos:
                     print("\nNenhum pedido registrado.")
                 else:
-                    print("\n>>>> Todos os pedidos <<<<")
-                    for pedido in pedidos:
-                        print(f"\nCódigo: {pedido[0]}")
-                        print("Itens:")
-                        for item in pedido[1]:
-                            subtotal = item[1] * item[2]
-                            print(f" - {item[0]} x{item[1]} (R${item[2]:.2f} cada) = R${subtotal:.2f}")
+
+                    print("\n       Consultar Pedidos       \n")
+                    print("[1] - Exibir todos")
+                    print("[2] - Filtrar por status")
+
+                    escolhaConsulta = input("Escolha uma opção:")
+
+                    if escolhaConsulta == "1":
+                        print("\n>>>> Todos os pedidos <<<<\n")
+                        for pedido in pedidos:
+                            print(f"\nCódigo: {pedido[0]}")
+                            print("Itens:")
+                            for item in pedido[1]:
+                                subtotal = item[1] * item[2]
+                                print(f" - {item[0]} x{item[1]} (R${item[2]:.2f} cada) = R${subtotal:.2f}")
 
                         print(f"Total: R${pedido[2]:.2f}")
                         print(f"Status: {pedido[3]}")
+
+                    elif escolhaConsulta == "2":
+                        print("\n     Escolha o filtro desejado      \n")
+                        print("\nEscolha o status para filtrar:")
+                        print("1 - AGUARDANDO APROVAÇÃO")
+                        print("2 - FAZENDO")
+                        print("3 - FEITO")
+                        print("4 - ESPERANDO ENTREGADOR")
+                        print("5 - SAIU PARA ENTREGA")
+                        print("6 - ENTREGUE")
+                        print("7 - CANCELADO")
+                        print("8 - REJEITADO")
+
+                        opcaoStatus = input("\n Opção >>")
+
+                            
+                        if opcaoStatus == "1":
+                            status_desejado = "AGUARDANDO APROVAÇÃO"
+                        elif opcaoStatus == "2":
+                            status_desejado = "FAZENDO"
+                        elif opcaoStatus == "3":
+                            status_desejado = "FEITO"
+                        elif opcaoStatus == "4":
+                            status_desejado = "ESPERANDO ENTREGADOR"
+                        elif opcaoStatus == "5":
+                            status_desejado = "SAIU PARA ENTREGA"
+                        elif opcaoStatus == "6":
+                            status_desejado = "ENTREGUE"
+                        elif opcaoStatus == "7":
+                            status_desejado = "CANCELADO"
+                        elif opcaoStatus == "8":
+                            status_desejado = "REJEITADO"
+                        else:
+                            print("\nOpção inválida!")
+                            continue
+
+                        pedidos_filtrados = []
+                        for pedido in pedidos:  # ✅ CORRIGIDO: era 'lista_pedidos'
+                            if pedido[3] == status_desejado:
+                                pedidos_filtrados.append(pedido)
+
+                        if not pedidos_filtrados:
+                            print(f"\nNenhum pedido encontrado com status: {status_desejado}")
+                        else:
+                            print(f"\n>>>> Pedidos com status: {status_desejado} <<<<\n")
+                            for pedido in pedidos_filtrados:
+                                print(f"Código: {pedido[0]}")
+                                print("Itens:")
+                                for item in pedido[1]:
+                                    subtotal = item[1] * item[2]
+                                    print(f" - {item[0]} x{item[1]} (R${item[2]:.2f} cada) = R${subtotal:.2f}")
+                                print(f"Total: R${pedido[2]:.2f}")
+                                print(f"Status: {pedido[3]}\n")
 
             elif opcaoPedido == "6":
                 break
